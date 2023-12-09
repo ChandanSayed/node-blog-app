@@ -1,3 +1,4 @@
+const usersCollection = require('../db').collection('users');
 const validator = require('validator');
 
 let User = function (data) {
@@ -39,12 +40,15 @@ User.prototype.validate = function () {
     this.errors.push('You must provide a password');
   }
   if (this.data.password != '' && this.data.password.length < 12) {
-    this.errors.push('Password Must be 12 characters!');
+    this.errors.push('Password Must be at lease 12 characters!');
   }
 };
 User.prototype.register = function () {
   this.cleanUp();
   this.validate();
+  if (!this.errors.length) {
+    usersCollection.insertOne(this.data);
+  }
 };
 
 module.exports = User;
