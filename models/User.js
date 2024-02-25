@@ -51,4 +51,22 @@ User.prototype.register = function () {
   }
 };
 
+User.prototype.login = async function () {
+  this.cleanUp();
+
+  const existingUser = await usersCollection.findOne({
+    username: this.data.username
+  });
+
+  if (existingUser) {
+    if (existingUser.password === this.data.password) {
+      console.log('Congrats!');
+    } else {
+      console.log('Invalid password');
+    }
+  } else {
+    console.log('Invalid username');
+  }
+};
+
 module.exports = User;
