@@ -51,7 +51,7 @@ User.prototype.register = function () {
   }
 };
 
-User.prototype.login = async function () {
+User.prototype.login = async function (callback) {
   this.cleanUp();
 
   const existingUser = await usersCollection.findOne({
@@ -60,12 +60,12 @@ User.prototype.login = async function () {
 
   if (existingUser) {
     if (existingUser.password === this.data.password) {
-      console.log('Congrats!');
+      callback('Congrats!');
     } else {
-      console.log('Invalid password');
+      callback('Invalid password');
     }
   } else {
-    console.log('Invalid username');
+    callback('Invalid username');
   }
 };
 
