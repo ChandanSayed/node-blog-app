@@ -1,9 +1,21 @@
 const User = require('../models/User');
-exports.login = function (req, res) {
-  const user = new User(req.body);
-  user.login(function (result) {
+exports.login = async (req, res) => {
+  try {
+    const user = new User(req.body);
+    const result = await user.login();
     res.send(result);
-  });
+  } catch (error) {
+    res.send(error);
+  }
+  // const user = new User(req.body);
+  // user
+  //   .login()
+  //   .then(result => {
+  //     res.send(result);
+  //   })
+  //   .catch(e => {
+  //     res.send(e);
+  //   });
 };
 exports.logout = function () {};
 exports.register = function (req, res) {

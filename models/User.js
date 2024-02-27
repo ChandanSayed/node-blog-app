@@ -1,3 +1,5 @@
+const bcryptjs = require('bcryptjs');
+
 const usersCollection = require('../db').collection('users');
 const validator = require('validator');
 
@@ -47,26 +49,33 @@ User.prototype.register = function () {
   this.cleanUp();
   this.validate();
   if (!this.errors.length) {
+    // hash the password
+
+    const salt = bcryptjs.genSaltSync(10);
+
+    this.data.password = bcryptjs.hashSync(this.data.password, salt);
+
     usersCollection.insertOne(this.data);
   }
 };
 
-User.prototype.login = async function (callback) {
-  this.cleanUp();
+User.prototype.login = function () {
+  return new Promise(async (resolve, reject) => {
+    try {
+      this.cleanUp();
+      const existingUser = await usersCollection.findOne({
+        username: this.data.username
+      });
 
-  const existingUser = await usersCollection.findOne({
-    username: this.data.username
-  });
-
-  if (existingUser) {
-    if (existingUser.password === this.data.password) {
-      callback('Congrats!');
-    } else {
-      callback('Invalid password');
+      if (existingUser && bcryptjs.compareSync(this.data.password, existingUser.password)) {
+        resolve('Congrats!');
+      } else {
+        reject('Invalid user/password');
+      }
+    } catch (err) {
+      reject('Try with correct credentials');
     }
-  } else {
-    callback('Invalid username');
-  }
+  });
 };
 
 module.exports = User;
