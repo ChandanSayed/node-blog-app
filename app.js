@@ -2,12 +2,14 @@ const express = require('express');
 const session = require('express-session');
 const app = express();
 
-let sessionOption = {
+let sessionOptions = session({
   secret: 'JavaScript is very cool!',
   resave: false,
   saveUninitialized: true,
   cookie: { maxAge: 1000 * 60 * 60 * 24, httpOnly: true }
-};
+});
+
+app.use(sessionOptions);
 
 const router = require('./router');
 

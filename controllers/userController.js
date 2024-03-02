@@ -2,6 +2,7 @@ const User = require('../models/User');
 exports.login = async (req, res) => {
   try {
     const user = new User(req.body);
+    req.session.user = { favColor: 'black', username: user.data.username };
     const result = await user.login();
     res.send(result);
   } catch (error) {
@@ -30,5 +31,10 @@ exports.register = function (req, res) {
 };
 
 exports.home = function (req, res) {
-  res.render('home-guest');
+  console.log(req.session.user);
+  if (req.session.user) {
+    res.send('Session is running');
+  } else {
+    res.render('home-guest');
+  }
 };
