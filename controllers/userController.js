@@ -2,8 +2,8 @@ const User = require('../models/User');
 exports.login = async (req, res) => {
   try {
     const user = new User(req.body);
-    req.session.user = { favColor: 'black', username: user.data.username };
     const result = await user.login();
+    req.session.user = { favColor: 'black', username: user.data.username };
     res.send(result);
   } catch (error) {
     res.send(error);

@@ -18,7 +18,7 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     await client.connect();
-    module.exports = client.db();
+    module.exports = client;
     const app = require('./app');
     app.listen(port, (req, res) => {
       console.log(`Running on ${port}`);
