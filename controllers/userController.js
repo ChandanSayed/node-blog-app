@@ -3,10 +3,18 @@ exports.login = async (req, res) => {
   try {
     const user = new User(req.body);
     const result = await user.login();
-    req.session.user = { favColor: 'black', username: user.data.username };
-    res.send(result);
+    console.log(result);
+    if (result === 'Congrats!') {
+      req.session.user = { favColor: 'black', username: user.data.username };
+      req.session.save(() => res.redirect('/'));
+    } else {
+      console.log('Invalid credentials!');
+    }
   } catch (error) {
-    res.send(error);
+    req.flash('error', error);
+    req.session.save(() => {
+      res.redirect('/');
+    });
   }
   // const user = new User(req.body);
   // user
@@ -18,7 +26,9 @@ exports.login = async (req, res) => {
   //     res.send(e);
   //   });
 };
-exports.logout = function () {};
+exports.logout = function (req, res) {
+  req.session.destroy(() => res.redirect('/'));
+};
 exports.register = function (req, res) {
   const user = new User(req.body);
   console.log(req.body);
@@ -31,9 +41,9 @@ exports.register = function (req, res) {
 };
 
 exports.home = function (req, res) {
-  console.log(req.session.user);
+  // console.log(req.session.user);
   if (req.session.user) {
-    res.send('Session is running');
+    res.render('home-dashboard', { username: req.session.user.username });
   } else {
     res.render('home-guest');
   }
