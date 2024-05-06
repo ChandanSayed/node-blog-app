@@ -1,19 +1,19 @@
-const User = require('../models/User');
+const User = require("../models/User");
 exports.login = async (req, res) => {
   try {
     const user = new User(req.body);
     const result = await user.login();
     console.log(result);
-    if (result === 'Congrats!') {
-      req.session.user = { favColor: 'black', username: user.data.username };
-      req.session.save(() => res.redirect('/'));
+    if (result === "Congrats!") {
+      req.session.user = { favColor: "black", username: user.data.username };
+      req.session.save(() => res.redirect("/"));
     } else {
-      console.log('Invalid credentials!');
+      console.log("Invalid credentials!");
     }
   } catch (error) {
-    req.flash('error', error);
+    req.flash("error", error);
     req.session.save(() => {
-      res.redirect('/');
+      res.redirect("/");
     });
   }
   // const user = new User(req.body);
@@ -27,24 +27,35 @@ exports.login = async (req, res) => {
   //   });
 };
 exports.logout = function (req, res) {
-  req.session.destroy(() => res.redirect('/'));
+  req.session.destroy(() => res.redirect("/"));
 };
 exports.register = function (req, res) {
   const user = new User(req.body);
-  console.log(req.body);
-  user.register();
-  if (user.errors.length) {
-    res.send(user.errors);
-  } else {
-    res.send('Congrats, there are no errors');
-  }
+
+  user
+    .register()
+    .then(() => {
+      req.session.user = { username: user.data.username };
+      req.session.save(() => {
+        res.redirect("/");
+      });
+    })
+    .catch(regErrors => {
+      regErrors.forEach(function (error) {
+        req.flash("regErrors", error);
+      });
+      console.log(regErrors);
+      req.session.save(() => {
+        res.redirect("/");
+      });
+    });
 };
 
 exports.home = function (req, res) {
   // console.log(req.session.user);
   if (req.session.user) {
-    res.render('home-dashboard', { username: req.session.user.username });
+    res.render("home-dashboard", { username: req.session.user.username });
   } else {
-    res.render('home-guest', { error: req.flash('error') });
+    res.render("home-guest", { error: req.flash("error"), regErrors: req.flash("regErrors") });
   }
 };
