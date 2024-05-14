@@ -5,7 +5,7 @@ exports.login = async (req, res) => {
     const result = await user.login();
     console.log(result);
     if (result === "Congrats!") {
-      req.session.user = { favColor: "black", username: user.data.username };
+      req.session.user = { avatar: user.avatar, username: user.data.username };
       req.session.save(() => res.redirect("/"));
     } else {
       console.log("Invalid credentials!");
@@ -35,7 +35,7 @@ exports.register = function (req, res) {
   user
     .register()
     .then(() => {
-      req.session.user = { username: user.data.username };
+      req.session.user = { username: user.data.username, avatar: user.avatar };
       req.session.save(() => {
         res.redirect("/");
       });
@@ -54,7 +54,10 @@ exports.register = function (req, res) {
 exports.home = function (req, res) {
   // console.log(req.session.user);
   if (req.session.user) {
-    res.render("home-dashboard", { username: req.session.user.username });
+    res.render("home-dashboard", {
+      username: req.session.user.username,
+      avatar: req.session.user.avatar
+    });
   } else {
     res.render("home-guest", { error: req.flash("error"), regErrors: req.flash("regErrors") });
   }
